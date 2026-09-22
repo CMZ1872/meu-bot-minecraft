@@ -15,15 +15,20 @@ let bot;
 function iniciarBot() {
   bot = mineflayer.createBot(botOptions);
 
-  bot.on('spawn', () => {
+    bot.on('spawn', () => {
     console.log("Bot entrou no servidor!");
+    
+    // FAZ O BOT SE TELEPORTAR PARA A COORDENADA EXATA ASSIM QUE ENTRAR
+    // Altere os números abaixo para a coordenada X, Y e Z do seu cantinho
+    bot.chat('/tp BotFixoAFK 100 64 -250'); 
+
     setInterval(() => {
       if (bot && bot.entity) {
-        // Gira a cabeça a cada 15 segundos para evitar o anti-AFK
         bot.look(Math.random() * Math.PI * 2, (Math.random() - 0.5) * Math.PI / 2);
       }
     }, 15000); 
   });
+
 
   bot.on('end', (reason) => {
     console.log(`Desconectado: ${reason}. Reconectando em 15s...`);

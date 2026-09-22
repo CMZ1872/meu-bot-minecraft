@@ -20,7 +20,7 @@ function iniciarBot() {
     
     // FAZ O BOT SE TELEPORTAR PARA A COORDENADA EXATA ASSIM QUE ENTRAR
     // Altere os números abaixo para a coordenada X, Y e Z do seu cantinho
-    bot.chat('/tp BotFixoAFK 100 64 -250'); 
+    bot.chat('/tp BotFixoAFK -74 -54 85'); 
 
     setInterval(() => {
       if (bot && bot.entity) {

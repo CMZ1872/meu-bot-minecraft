@@ -1,14 +1,12 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// Cria um servidor web em uma porta limpa e alternativa
-const server = http.createServer((req, res) => res.end("Bot Online"));
-server.listen(process.env.PORT || 10000, '0.0.0.0');
+http.createServer((req, res) => res.end("Bot 1 Online")).listen(process.env.PORT || 3000);
 
 const botOptions = {
-  host: 'bluewhiting.aternos.host', // Seu IP Dinâmico atualizado
-  port: 30660,                      // Sua porta de 5 números atualizada
-  username: 'BotFixoAFK'
+  host: 'bluewhiting.aternos.host', // Verifique se o seu IP dinâmico atual é esse
+  port: 30660,                      // Verifique se a sua porta atual é essa
+  username: 'BotFixoAFK'           // Coloque o nome exato que você desbaniu
 };
 
 let bot;
@@ -17,20 +15,28 @@ function iniciarBot() {
   bot = mineflayer.createBot(botOptions);
 
   bot.on('spawn', () => {
-    console.log(`Sucesso: ${bot.username} entrou no servidor!`);
+    console.log("Bot entrou! Movendo para estabilizar...");
+    
+    // ANTI-KICK DE ENTRADA: Faz o bot pular uma vez assim que nasce para a Aternos não chutar
+    setTimeout(() => {
+      if (bot) bot.setControlState('jump', true);
+      setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 500);
+    }, 2000);
+
+    // Ciclo Anti-AFK contínuo (Gira a cabeça a cada 10 segundos)
     setInterval(() => {
       if (bot && bot.entity) {
         bot.look(Math.random() * Math.PI * 2, (Math.random() - 0.5) * Math.PI / 2);
       }
-    }, 12000); 
+    }, 10000); 
   });
 
   bot.on('end', (reason) => {
-    console.log(`Conexão encerrada: ${reason}. Tentando novamente em 20s...`);
-    setTimeout(iniciarBot, 20000);
+    console.log(`Desconectado: ${reason}. Reconectando em 10s...`);
+    setTimeout(iniciarBot, 10000);
   });
 
-  bot.on('error', (err) => console.log(`Erro de rede: ${err.message}`));
+  bot.on('error', (err) => console.log(`Erro: ${err.message}`));
 }
 
 iniciarBot();

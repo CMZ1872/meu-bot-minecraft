@@ -4,53 +4,46 @@ const http = require('http');
 http.createServer((req, res) => res.end("Bot Online")).listen(process.env.PORT || 3000);
 
 const botOptions = {
-  host: 'florestgames.aternos.me', // Seu IP do começo que funcionava
+  host: 'florestgames.aternos.me', 
   username: 'BotFixoAFK',
-  skipValidation: true             // Ignora validação pesada que causa lag de login
+  skipValidation: true
 };
 
 let bot;
 
 function iniciarBot() {
-  bot = mineflayer.createBot(botOptions);
+  // Se já existir uma instância do bot rodando na memória, limpa ela totalmente antes
+  if (bot) {
+    try {
+      bot.quit(); 
+    } catch(e) {}
+    bot = null;
+  }
 
-  // FIX DEFINTIVO DOS 5 SEGUNDOS (Fase de Configuração)
-  // Força o bot a fingir que é um cliente oficial configurado logo no primeiro milissegundo
-  bot.on('packet', (data, metadata) => {
-    if (metadata.name === 'configuration_requested' || metadata.name === 'bundle_delimiter') {
-      try {
-        bot._client.write('settings', {
-          locale: 'pt_br',
-          viewDistance: 4,
-          chatFlags: 0,
-          chatColors: true,
-          skinParts: 127,
-          mainHand: 1,
-          enableTextFiltering: false,
-          enableServerListing: true
-        });
-      } catch (e) {}
-    }
-  });
+  bot = mineflayer.createBot(botOptions);
 
   bot.on('spawn', () => {
     console.log('Bot entrou e estabilizou no servidor com sucesso!');
-    
-    // Pequeno pulo de 1 segundo após entrar para garantir o registro do jogador
-    setTimeout(() => {
-      if (bot) {
-        bot.setControlState('jump', true);
-        setTimeout(() => { if (bot) bot.setControlState('jump', false); }, 400);
-      }
-    }, 1000);
   });
 
+  // RESOLVENDO O LOOP: Força o bot a se destruir totalmente antes de tentar ligar de novo
   bot.on('end', (reason) => {
-    console.log(`O bot desconectou: ${reason}. Tentando reconectar em 10 segundos...`);
-    setTimeout(iniciarBot, 10000);
+    console.log(`O bot desconectou de forma limpa: ${reason}.`);
+    
+    try {
+      bot.quit(); // Garante o fechamento total da conexão velha
+    } catch(e) {}
+    bot = null;
+
+    console.log('Aguardando 15 segundos para abrir uma nova conexão limpa...');
+    setTimeout(iniciarBot, 15000); // Aumentamos para 15s para dar tempo da Aternos liberar o slot do IP
   });
 
-  bot.on('error', (err) => console.log("Erro de rede tratado:", err.message));
+  bot.on('error', (err) => {
+    console.log("Erro de rede tratado:", err.message);
+    try { bot.quit(); } catch(e) {}
+    bot = null;
+  });
 }
 
 iniciarBot();

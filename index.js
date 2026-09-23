@@ -1,15 +1,14 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// Porta viva para o Render não dar erro
 http.createServer((req, res) => res.end("Bot 1 Online")).listen(process.env.PORT || 3000);
 
 const botOptions = {
-  host: 'bluewhiting.aternos.host', // Seu IP Dinâmico atual
-  port: 30660,                      // Sua porta atual
-  username: 'BotFixoAFK',          
-  hideErrors: true,                 // Esconde logs repetitivos
-  viewDistance: 'tiny'              // COMPATIBILIDADE 26.2: Força o pacote de renderização leve
+  host: 'bluewhiting.aternos.host', 
+  port: 30660,                      
+  username: 'BotFixoAFK',
+  checkTimeoutInterval: 60 * 1000, // Aumenta o tempo de tolerância de lag para 1 minuto
+  viewDistance: 'tiny'
 };
 
 let bot;
@@ -17,38 +16,33 @@ let bot;
 function iniciarBot() {
   bot = mineflayer.createBot(botOptions);
 
-  // Trava a física logo no carregamento para evitar kick por movimento inválido
-  bot.physics = null;
-
-  bot.on('login', () => {
-    console.log("Fase de login bem-sucedida. Aguardando spawn...");
+  // Força o bot a responder os pacotes de "estou vivo" (KeepAlive) na hora para não dar socketClosed
+  bot.on('packet', (data, metadata) => {
+    if (metadata.name === 'keep_alive') {
+      bot._client.write('keep_alive', {
+        keepAliveId: data.keepAliveId
+      });
+    }
   });
 
   bot.on('spawn', () => {
-    console.log("Bot 1 entrou e se estabilizou no servidor!");
+    console.log("Bot 1 estabilizado e conectado com sucesso!");
     
-    // Pequeno delay de segurança para garantir a sincronia dos blocos
-    setTimeout(() => {
-      if (bot) {
-        // Envia um comando leve no chat a cada 3 minutos para a Aternos ver atividade real
-        setInterval(() => {
-          if (bot) bot.chat('/me está ativo.');
-        }, 180000);
+    // Pequeno movimento mecânico para o servidor registrar a presença física dele
+    setInterval(() => {
+      if (bot && bot.entity) {
+        bot.setControlState('sneak', true);
+        setTimeout(() => { if (bot) bot.setControlState('sneak', false); }, 500);
       }
-    }, 3000);
+    }, 30000); // Agacha a cada 30 segundos
   });
 
   bot.on('end', (reason) => {
-    console.log(`Desconectado por: ${reason}. Reconectando em 15s...`);
-    setTimeout(iniciarBot, 15000);
+    console.log(`Desconectado por: ${reason}. Reconectando em 10s...`);
+    setTimeout(iniciarBot, 10000);
   });
 
-  bot.on('error', (err) => {
-    // Ignora o erro comum de timeout interno do protocolo
-    if (err.message.includes('timeout') || err.message.includes('protocol')) return;
-    console.log(`Aviso de rede tratado: ${err.message}`);
-  });
+  bot.on('error', (err) => console.log(`Erro tratado: ${err.message}`));
 }
 
-// Inicia o robô
 iniciarBot();

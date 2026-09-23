@@ -1,14 +1,12 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-http.createServer((req, res) => res.end("Bot 1 Online")).listen(process.env.PORT || 3000);
+// Mantém o Render vivo
+http.createServer((req, res) => res.end("Bot Online")).listen(process.env.PORT || 3000);
 
 const botOptions = {
-  host: 'bluewhiting.aternos.host', 
-  port: 30660,                      
-  username: 'BotFixoAFK',
-  checkTimeoutInterval: 60 * 1000, // Aumenta o tempo de tolerância de lag para 1 minuto
-  viewDistance: 'tiny'
+  host: 'florestgames.aternos.me', // <<< VOLTE PARA O SEU IP NORMAL DO COMEÇO!
+  username: 'BotFixoAFK'           // Mude para o nick que estava funcionando antes
 };
 
 let bot;
@@ -16,33 +14,17 @@ let bot;
 function iniciarBot() {
   bot = mineflayer.createBot(botOptions);
 
-  // Força o bot a responder os pacotes de "estou vivo" (KeepAlive) na hora para não dar socketClosed
-  bot.on('packet', (data, metadata) => {
-    if (metadata.name === 'keep_alive') {
-      bot._client.write('keep_alive', {
-        keepAliveId: data.keepAliveId
-      });
-    }
-  });
-
   bot.on('spawn', () => {
-    console.log("Bot 1 estabilizado e conectado com sucesso!");
-    
-    // Pequeno movimento mecânico para o servidor registrar a presença física dele
-    setInterval(() => {
-      if (bot && bot.entity) {
-        bot.setControlState('sneak', true);
-        setTimeout(() => { if (bot) bot.setControlState('sneak', false); }, 500);
-      }
-    }, 30000); // Agacha a cada 30 segundos
+    console.log('Bot entrou no servidor com sucesso!');
   });
 
   bot.on('end', (reason) => {
-    console.log(`Desconectado por: ${reason}. Reconectando em 10s...`);
+    console.log(`O bot desconectou: ${reason}`);
+    console.log('Tentando reconectar em 10 segundos...');
     setTimeout(iniciarBot, 10000);
   });
 
-  bot.on('error', (err) => console.log(`Erro tratado: ${err.message}`));
+  bot.on('error', (err) => console.log(err));
 }
 
 iniciarBot();

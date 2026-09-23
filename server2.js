@@ -7,7 +7,8 @@ http.createServer((req, res) => res.end("Bot 2 Online")).listen(process.env.PORT
 const botOptions = {
   host: 'caducaio.aternos.me', // <<< COLOQUE O IP DO SEU SEGUNDO SERVIDOR AQUI
   port: 29046,                         
-  username: 'BotFixoAFK2',               // Mude o nome se quiser diferenciar do primeiro
+  username: 'BotFixoAFK2',
+  version: '26.2'// Mude o nome se quiser diferenciar do primeiro
 };
 
 let bot;

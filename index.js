@@ -1,42 +1,36 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// Cria uma página web falsa para o Render não desligar o bot
-http.createServer((req, res) => res.end("Bot Online")).listen(process.env.PORT || 3000);
+// Cria um servidor web em uma porta limpa e alternativa
+const server = http.createServer((req, res) => res.end("Bot Online"));
+server.listen(process.env.PORT || 10000, '0.0.0.0');
 
 const botOptions = {
-  host: 'bluewhiting.aternos.host', // Coloque o IP do primeiro servidor
-  port: 30660,                                    // Porta do primeiro servidor
-  username: 'BotFixoAFK'                          // SEM A LINHA VERSION!
+  host: 'bluewhiting.aternos.host', // Seu IP Dinâmico atualizado
+  port: 30660,                      // Sua porta de 5 números atualizada
+  username: 'JogadorAFK_' + Math.floor(Math.random() * 1000) // Nome camuflado de jogador normal
 };
-
 
 let bot;
 
 function iniciarBot() {
   bot = mineflayer.createBot(botOptions);
 
-    bot.on('spawn', () => {
-    console.log("Bot entrou no servidor!");
-    
-    // FAZ O BOT SE TELEPORTAR PARA A COORDENADA EXATA ASSIM QUE ENTRAR
-    // Altere os números abaixo para a coordenada X, Y e Z do seu cantinho
-    bot.chat('/tp BotFixoAFK -74 -54 85'); 
-
+  bot.on('spawn', () => {
+    console.log(`Sucesso: ${bot.username} entrou no servidor!`);
     setInterval(() => {
       if (bot && bot.entity) {
         bot.look(Math.random() * Math.PI * 2, (Math.random() - 0.5) * Math.PI / 2);
       }
-    }, 15000); 
+    }, 12000); 
   });
-
 
   bot.on('end', (reason) => {
-    console.log(`Desconectado: ${reason}. Reconectando em 15s...`);
-    setTimeout(iniciarBot, 15000);
+    console.log(`Conexão encerrada: ${reason}. Tentando novamente em 20s...`);
+    setTimeout(iniciarBot, 20000);
   });
 
-  bot.on('error', (err) => console.log(`Erro: ${err.message}`));
+  bot.on('error', (err) => console.log(`Erro de rede: ${err.message}`));
 }
 
 iniciarBot();

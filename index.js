@@ -8,7 +8,7 @@ server.listen(process.env.PORT || 10000, '0.0.0.0');
 const botOptions = {
   host: 'bluewhiting.aternos.host', // Seu IP Dinâmico atualizado
   port: 30660,                      // Sua porta de 5 números atualizada
-  username: 'JogadorAFK_' + Math.floor(Math.random() * 1000) // Nome camuflado de jogador normal
+  username: 'BotFixoAFK'
 };
 
 let bot;

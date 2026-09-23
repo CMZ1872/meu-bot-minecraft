@@ -6,7 +6,7 @@ http.createServer((req, res) => res.end("Bot Online")).listen(process.env.PORT |
 
 const botOptions = {
   host: 'florestgames.aternos.me', // <<< COLOQUE O IP DO SEU SERVIDOR AQUI
-  port: 25565,                         
+  port: 30660,                         
   username: 'BotFixoAFK',              
 };
 

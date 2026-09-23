@@ -5,11 +5,11 @@ const http = require('http');
 http.createServer((req, res) => res.end("Bot Online")).listen(process.env.PORT || 3000);
 
 const botOptions = {
-  host: 'florestgames.aternos.me', // <<< COLOQUE O IP DO SEU SERVIDOR AQUI
-  port: 30660,                         
-  username: 'BotFixoAFK',
-  version: '26.2',
+  host: 'florestgames.aternos.me:30660', // Coloque o IP do primeiro servidor
+  port: 30660,                                    // Porta do primeiro servidor
+  username: 'BotFixoAFK'                          // SEM A LINHA VERSION!
 };
+
 
 let bot;
 
